@@ -2,4 +2,4 @@
 
 An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.
 
-<img src="https://github.com/daleroberts/itermplot/raw/master/docs/subplots.png">
+<img src="https://github.com/daleroberts/itermplot/raw/master/docs/subplots.png" width="700">
