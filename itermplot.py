@@ -82,8 +82,13 @@ def imgcat(data, lines=-1):
     buf += b64encode(data) + st
     if lines > 0:
         buf += csi + b'%dE' % lines + csi + b'?25h'
-    sys.stdout.buffer.write(buf)
-    sys.stdout.flush()
+
+    if not hasattr(sys.stdout, 'buffer'):
+        print('Something is wrong with your stdout. Are you running bpython?')
+    else:
+        sys.stdout.buffer.write(buf)
+        sys.stdout.flush()
+
     print()
 
 def draw_if_interactive():
