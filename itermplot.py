@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib
 import sys
 import os
-import io 
+import io
 
 from matplotlib._pylab_helpers import Gcf
 from matplotlib.colors import ColorConverter
@@ -170,7 +170,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
             kwargs.setdefault('facecolor', rcParams['savefig.facecolor'])
             kwargs.setdefault('edgecolor', rcParams['savefig.edgecolor'])
 
-        if 'rv' in os.getenv('ITERMPLOT'):
+        if 'rv' in os.getenv('ITERMPLOT', []):
             self.reverse()
 
         image_dpi = kwargs.get('dpi', 72)  # dpi to use for images
@@ -203,7 +203,7 @@ class MyFigureManager(FigureManagerBase):
     def show(self):
         #colors()
         data = io.BytesIO()
-        self.canvas.print_figure(data, facecolor='none', 
+        self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
         imgcat(data.getbuffer())
 
