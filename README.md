@@ -33,6 +33,13 @@ plt.show()
 
 Note: you need to run `plt.show()` to display the figure.
 
+## Reverse video
+
+If you use a dark background in your terminal, you can enable "reverse video" mode by adding this to your `.profile`:
+```
+export ITERMPLOT="rv"
+```
+
 ## Installation
 
 ### Using pip
@@ -58,11 +65,6 @@ export PYTHONPATH=~/itermplot:$PYTHONPATH
 export MPLBACKEND="module://itermplot"
 ```
 
-For reverse video, add the following to your `.profile`:
-```
-export ITERMPLOT="rv"
-```
-
-# Bugs
+## Bugs
 
 This is backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it. Thanks.
