@@ -170,7 +170,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
             kwargs.setdefault('facecolor', rcParams['savefig.facecolor'])
             kwargs.setdefault('edgecolor', rcParams['savefig.edgecolor'])
 
-        if 'rv' in os.getenv('ITERMPLOT'):
+        if 'rv' in os.getenv('ITERMPLOT', ''):
             self.reverse()
 
         image_dpi = kwargs.get('dpi', 72)  # dpi to use for images
