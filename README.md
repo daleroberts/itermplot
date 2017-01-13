@@ -2,7 +2,13 @@
 
 An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.
 
+<img src="https://github.com/daleroberts/itermplot/raw/master/docs/lightdark.png" width="960">
+
+## IPython support
+
 <img src="https://github.com/daleroberts/itermplot/raw/master/docs/subplots.png" width="700">
+
+Note: you need to run `plt.show()` to display the figure.
 
 ## Installation
 
