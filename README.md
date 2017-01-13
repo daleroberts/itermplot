@@ -6,7 +6,7 @@ An awesome iTerm2 backend for Matplotlib, so you can plot directly in your termi
 
 The above is achieved with zero modifications to your Python script. For example, the above 
 plots are generated with the following code:
-```
+```{python}
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
