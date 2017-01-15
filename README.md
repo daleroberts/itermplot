@@ -33,14 +33,14 @@ plt.show()
 
 Note: you need to run `plt.show()` to display the figure.
 
-## Reverse video
+### Reverse video
 
 If you use a dark background in your terminal, you can enable "reverse video" mode by adding this to your `.profile`:
 ```
 export ITERMPLOT="rv"
 ```
 
-## TMUX support
+### TMUX support
 
 itermplot tries to auto-detect TMUX and behave in a sane way. Vertical split panes do not work well due to a
 limitation with iTerm2. Luckily, horizontals do though.
