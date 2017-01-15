@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib
 import sys
 import os
-import io 
+import io
 
 from matplotlib._pylab_helpers import Gcf
 from matplotlib.colors import ColorConverter
@@ -211,7 +211,7 @@ class MyFigureManager(FigureManagerBase):
     def show(self):
         #colors()
         data = io.BytesIO()
-        self.canvas.print_figure(data, facecolor='none', 
+        self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
         imgcat(data.getbuffer())
 
