@@ -1,6 +1,12 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='itermplot',
+      packages=find_packages(),
+      install_requires=[
+        'matplotlib',
+        'six',
+        'numpy'
+      ],
       version='0.1',
       description='An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.',
       url='http://github.com/daleroberts/itermplot',
