@@ -81,7 +81,7 @@ def imgcat(data, lines=-1):
     buf += b'1337;File=;size=%d;inline=1;' % len(data) + dims + b':'
     buf += b64encode(data) + st
     if lines > 0:
-        buf += csi + b'%dE' % lines + csi + b'?25h'
+        buf += csi + bytes(lines) + b'E' + csi + b'?25h'
 
     if not hasattr(sys.stdout, 'buffer'):
         print('Something is wrong with your stdout. Are you running bpython?')
