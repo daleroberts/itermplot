@@ -90,6 +90,7 @@ def imgcat(data, lines=-1):
 
     print()
 
+
 def draw_if_interactive():
     if matplotlib.is_interactive():
         figmanager = Gcf.get_active()
@@ -212,7 +213,10 @@ class MyFigureManager(FigureManagerBase):
         data = io.BytesIO()
         self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
-        imgcat(data.getvalue())
+        if hasattr(data, 'getbuffer'):
+            imgcat(data.getbuffer())
+        else:
+            imgcat(data.getvalue())
 
 FigureCanvas = FigureCanvasPdf
 FigureManager = MyFigureManager
