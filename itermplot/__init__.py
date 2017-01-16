@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-An iTerm2 matplotlib backend
+An iTerm2 matplotlib backend.
 
 Author: Dale Roberts <dale.o.roberts@gmail.com>
 """
@@ -30,25 +30,19 @@ rcParams = matplotlib.rcParams
 TMUX = os.getenv('TERM','').startswith('screen')
 COLORS = ColorConverter.colors
 
+
 if sys.version_info < (3,):
-    print('py2')
     # Supporting Python 2 makes me want to cry :_(
     def B(x):
         return bytes(x)
 else:
-    print('py3')
     def B(x):
         return bytes(x, 'utf-8')
 
-def colors():
-    profile = os.getenv('ITERM_PROFILE')
-    env = os.getenv('ITERMPLOT')
-    print(profile)
-    print(env)
-
-    return env
 
 def revvideo(x):
+    """Try to 'reverse video' the color. Otherwise, 
+    return the object unchanged if it can't."""
     def rev(c):
         if isinstance(c, str):
             c = COLORS[c]
@@ -71,7 +65,13 @@ def revvideo(x):
     except ValueError:
         return x
 
+
 def imgcat(data, lines=-1):
+    """Output the image data to the iTerm2 console. If `lines` is greater
+    than zero then advance the console `lines` number of blank lines, move
+    back, and then output the image. This is the default behaviour if TMUX
+    is detected (lines set to 10)."""
+
     if TMUX:
         if lines == -1:
             lines = 10
@@ -81,17 +81,22 @@ def imgcat(data, lines=-1):
         osc = b'\033]'
         st = b'\a'
     csi = b'\033['
+    
     buf = bytes()
+    
     if lines > 0:
         buf += lines*b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
         dims = 'width=auto;height=auto'
+    
     buf += B('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
+    
     if lines > 0:
         buf += csi + B('%dE' % lines) + csi + b'?25h' 
+    
     if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(buf)
     else:
@@ -173,7 +178,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         transparent = kwargs.pop('transparent',
                                  rcParams['savefig.transparent'])
 
-        if True:
+        if transparent:
             kwargs.setdefault('facecolor', 'none')
             kwargs.setdefault('edgecolor', 'none')
             original_axes_colors = []
@@ -191,27 +196,8 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         if 'rv' in os.getenv('ITERMPLOT', ''):
             self.reverse()
 
-        image_dpi = kwargs.get('dpi', 72)  # dpi to use for images
-        self.figure.set_dpi(72)            # there are 72 pdf points to an inch
-        width, height = self.figure.get_size_inches()
-        if isinstance(filename, PdfPages):
-            file = filename._file
-        else:
-            file = PdfFile(filename)
-        try:
-            file.newPage(width, height)
-            _bbox_inches_restore = kwargs.pop("bbox_inches_restore", None)
-            renderer = MixedModeRenderer(
-                self.figure, width, height, image_dpi,
-                RendererPdf(file, image_dpi),
-                bbox_inches_restore=_bbox_inches_restore)
-            self.figure.draw(renderer)
-            renderer.finalize()
-        finally:
-            if isinstance(filename, PdfPages):  # finish off this page
-                file.endStream()
-            else:            # we opened the file above; now finish it off
-                file.close()
+        FigureCanvasPdf.print_pdf(self, filename, **kwargs)
+
 
 class MyFigureManager(FigureManagerBase):
 
@@ -219,7 +205,6 @@ class MyFigureManager(FigureManagerBase):
         FigureManagerBase.__init__(self, canvas, num)
 
     def show(self):
-        #colors()
         data = io.BytesIO()
         self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
@@ -227,6 +212,7 @@ class MyFigureManager(FigureManagerBase):
             imgcat(data.getbuffer())
         else:
             imgcat(data.getvalue())
+
 
 FigureCanvas = FigureCanvasPdf
 FigureManager = MyFigureManager
