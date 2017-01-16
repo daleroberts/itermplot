@@ -30,6 +30,16 @@ rcParams = matplotlib.rcParams
 TMUX = os.getenv('TERM','').startswith('screen')
 COLORS = ColorConverter.colors
 
+if sys.version_info < (3,):
+    print('py2')
+    # Supporting Python 2 makes me want to cry :_(
+    def B(x):
+        return bytes(x)
+else:
+    print('py3')
+    def B(x):
+        return bytes(x, 'utf-8')
+
 def colors():
     profile = os.getenv('ITERM_PROFILE')
     env = os.getenv('ITERMPLOT')
@@ -73,15 +83,15 @@ def imgcat(data, lines=-1):
     csi = b'\033['
     buf = bytes()
     if lines > 0:
-        buf += lines*b'\n' + csi + b'?25l' + csi + bytes('%dF' % lines) + osc
+        buf += lines*b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
         dims = 'width=auto;height=auto'
-    buf += bytes('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
+    buf += B('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
     if lines > 0:
-        buf += csi + bytes('%dE' % lines, 'utf-8') + csi + b'?25h' 
+        buf += csi + B('%dE' % lines) + csi + b'?25h' 
     if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(buf)
     else:
