@@ -73,21 +73,20 @@ def imgcat(data, lines=-1):
     csi = b'\033['
     buf = bytes()
     if lines > 0:
-        buf += lines*b'\n' + csi + b'?25l' + csi + bytes('%dF' % lines, 'utf-8') + osc
+        buf += lines*b'\n' + csi + b'?25l' + csi + bytes('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
         dims = 'width=auto;height=auto'
-    buf += bytes('1337;File=;size=%d;inline=1;' % len(data) + dims + ':', 'utf-8')
+    buf += bytes('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
     if lines > 0:
-        buf += csi + bytes('%dE' % lines, 'utf-8') + csi + b'?25h'
-
-    if not hasattr(sys.stdout, 'buffer'):
-        print('Something is wrong with your stdout. Are you running bpython?')
-    else:
+        buf += csi + bytes('%dE' % lines, 'utf-8') + csi + b'?25h' 
+    if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(buf)
-        sys.stdout.flush()
+    else:
+        sys.stdout.write(buf)
+    sys.stdout.flush()
 
     print()
 
@@ -213,7 +212,7 @@ class MyFigureManager(FigureManagerBase):
         data = io.BytesIO()
         self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
-        imgcat(data.getbuffer())
+        imgcat(data.getvalue())
 
 FigureCanvas = FigureCanvasPdf
 FigureManager = MyFigureManager
