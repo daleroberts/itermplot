@@ -1,6 +1,6 @@
 # itermplot
 
-An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.
+An awesome [iTerm2](https://www.iterm2.com/) backend for Matplotlib, so you can plot directly in your terminal.
 
 <img src="https://github.com/daleroberts/itermplot/raw/master/docs/lightdark.png" width="960">
 
@@ -33,17 +33,79 @@ plt.show()
 
 Note: you need to run `plt.show()` to display the figure.
 
-## Installation
+### Reverse video
 
-To install, you need to have the `itermplot.py` file in your `PYTHONPATH` and have the `MPLBACKEND` 
-environment variable set. One way to do this (permanently) is to add the following two lines to your
-`.profile` file in your home directory.
-```
-export PYTHONPATH=~/itermplot:$PYTHONPATH
-export MPLBACKEND="module://itermplot"
-```
-
-For reverse video, add the following to your `.profile`:
+If you use a dark background in your terminal, you can enable "reverse video" mode by adding this to your `.profile`:
 ```
 export ITERMPLOT="rv"
 ```
+
+### TMUX support
+
+itermplot tries to auto-detect TMUX and behave in a sane way. Vertical split panes do not work well due to a
+limitation with iTerm2. Luckily, horizontals do though.
+
+## Installation
+
+### Using pip
+
+Install using `pip` using the command:
+```{sh}
+pip3 install itermplot
+```
+
+itermplot is enabled by setting `MPLBACKEND` in your environment. If you use `bash`, then this can be accomplished using the command:
+```{sh}
+export MPLBACKEND="module://itermplot"
+```
+Note: you can add the `export` line above to your `.profile` file so that itermplot is always enabled in your terminal.
+
+### Testing
+
+To test your installation you can do the following in your iTerm2 console:
+```
+$ echo $MPLBACKEND
+module://itermplot
+$ python3
+Python 3.5.2 (default, Oct 24 2016, 09:14:06)
+[GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.38)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import matplotlib.pyplot as plt
+>>> plt.plot([1,2,3])
+[<matplotlib.lines.Line2D object at 0x1041f2e48>]
+>>> plt.show()
+```
+
+You should see a plot!
+
+## Uninstall
+
+You can disable this backend by unsetting the `MPLBACKEND` environment variable.
+```
+$ unset MPLBACKEND
+$ echo $MPLBACKEND
+
+$ python3
+Python 3.5.2 (default, Oct 24 2016, 09:14:06)
+[GCC 4.2.1 Compatible Apple LLVM 8.0.0 (clang-800.0.38)] on darwin
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import matplotlib.pyplot as plt
+>>> plt.plot([1,2,3])
+[<matplotlib.lines.Line2D object at 0x1106bdcc0>]
+>>> plt.show()
+```
+
+To remove the package completely, run:
+```
+pip3 uninstall itermplot
+```
+
+## Bugs
+
+This is backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it. Thanks.
+
+I also accept (and appreciate!) patches / pull request.
+
+## Other cool things
+
+I encourage you to check-out some of my [other little projects](https://github.com/daleroberts). Lots more coming as I slowly release them...

@@ -49,14 +49,17 @@ def revvideo(x):
         else:
             r, g, b = c
             return (1.0 - r, 1.0 - g, 1.0 - b, 1.0)
+    try:
+        if isinstance(x, str) and x == 'none':
+            return x
 
-    if isinstance(x, str) and x == 'none':
+        if isinstance(x, np.ndarray):
+            return np.array([rev(el) for el in x])
+        else:
+            return rev(x)
+
+    except ValueError:
         return x
-
-    if isinstance(x, np.ndarray):
-        return np.array([rev(el) for el in x])
-    else:
-        return rev(x)
 
 def imgcat(data, lines=-1):
     if TMUX:
@@ -70,17 +73,22 @@ def imgcat(data, lines=-1):
     csi = b'\033['
     buf = bytes()
     if lines > 0:
-        buf += lines*b'\n' + csi + b'?25l' + csi + b'%dF' % lines + osc
-        dims = b'width=auto;height=%d;preserveAspectRatio=1' % lines
+        buf += lines*b'\n' + csi + b'?25l' + csi + bytes('%dF' % lines, 'utf-8') + osc
+        dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
-        dims = b'width=auto;height=auto'
-    buf += b'1337;File=;size=%d;inline=1;' % len(data) + dims + b':'
+        dims = 'width=auto;height=auto'
+    buf += bytes('1337;File=;size=%d;inline=1;' % len(data) + dims + ':', 'utf-8')
     buf += b64encode(data) + st
     if lines > 0:
-        buf += csi + b'%dE' % lines + csi + b'?25h'
-    sys.stdout.buffer.write(buf)
-    sys.stdout.flush()
+        buf += csi + bytes('%dE' % lines, 'utf-8') + csi + b'?25h'
+
+    if not hasattr(sys.stdout, 'buffer'):
+        print('Something is wrong with your stdout. Are you running bpython?')
+    else:
+        sys.stdout.buffer.write(buf)
+        sys.stdout.flush()
+
     print()
 
 def draw_if_interactive():
@@ -170,7 +178,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
             kwargs.setdefault('facecolor', rcParams['savefig.facecolor'])
             kwargs.setdefault('edgecolor', rcParams['savefig.edgecolor'])
 
-        if 'rv' in os.getenv('ITERMPLOT', []):
+        if 'rv' in os.getenv('ITERMPLOT', ''):
             self.reverse()
 
         image_dpi = kwargs.get('dpi', 72)  # dpi to use for images
