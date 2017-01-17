@@ -53,16 +53,14 @@ def revvideo(x):
         else:
             r, g, b = c
             return (1.0 - r, 1.0 - g, 1.0 - b, 1.0)
+    
     try:
         if isinstance(x, str) and x == 'none':
             return x
-
         if isinstance(x, np.ndarray):
             return np.array([rev(el) for el in x])
-        else:
-            return rev(x)
-
-    except ValueError:
+        return rev(x)
+    except (ValueError, KeyError):
         return x
 
 
