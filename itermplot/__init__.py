@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-An iTerm2 matplotlib backend
+An iTerm2 matplotlib backend.
 
 Author: Dale Roberts <dale.o.roberts@gmail.com>
 """
@@ -30,15 +30,19 @@ rcParams = matplotlib.rcParams
 TMUX = os.getenv('TERM','').startswith('screen')
 COLORS = ColorConverter.colors
 
-def colors():
-    profile = os.getenv('ITERM_PROFILE')
-    env = os.getenv('ITERMPLOT')
-    print(profile)
-    print(env)
 
-    return env
+if sys.version_info < (3,):
+    # Supporting Python 2 makes me want to cry :_(
+    def B(x):
+        return bytes(x)
+else:
+    def B(x):
+        return bytes(x, 'utf-8')
+
 
 def revvideo(x):
+    """Try to 'reverse video' the color. Otherwise, 
+    return the object unchanged if it can't."""
     def rev(c):
         if isinstance(c, str):
             c = COLORS[c]
@@ -49,19 +53,23 @@ def revvideo(x):
         else:
             r, g, b = c
             return (1.0 - r, 1.0 - g, 1.0 - b, 1.0)
+    
     try:
         if isinstance(x, str) and x == 'none':
             return x
-
         if isinstance(x, np.ndarray):
             return np.array([rev(el) for el in x])
-        else:
-            return rev(x)
-
-    except ValueError:
+        return rev(x)
+    except (ValueError, KeyError):
         return x
 
+
 def imgcat(data, lines=-1):
+    """Output the image data to the iTerm2 console. If `lines` is greater
+    than zero then advance the console `lines` number of blank lines, move
+    back, and then output the image. This is the default behaviour if TMUX
+    is detected (lines set to 10)."""
+
     if TMUX:
         if lines == -1:
             lines = 10
@@ -71,25 +79,30 @@ def imgcat(data, lines=-1):
         osc = b'\033]'
         st = b'\a'
     csi = b'\033['
+    
     buf = bytes()
+    
     if lines > 0:
-        buf += lines*b'\n' + csi + b'?25l' + csi + bytes('%dF' % lines, 'utf-8') + osc
+        buf += lines*b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
         dims = 'width=auto;height=auto'
-    buf += bytes('1337;File=;size=%d;inline=1;' % len(data) + dims + ':', 'utf-8')
+    
+    buf += B('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
+    
     if lines > 0:
-        buf += csi + bytes('%dE' % lines, 'utf-8') + csi + b'?25h'
-
-    if not hasattr(sys.stdout, 'buffer'):
-        print('Something is wrong with your stdout. Are you running bpython?')
-    else:
+        buf += csi + B('%dE' % lines) + csi + b'?25h' 
+    
+    if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(buf)
-        sys.stdout.flush()
+    else:
+        sys.stdout.write(buf)
+    sys.stdout.flush()
 
     print()
+
 
 def draw_if_interactive():
     if matplotlib.is_interactive():
@@ -163,7 +176,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         transparent = kwargs.pop('transparent',
                                  rcParams['savefig.transparent'])
 
-        if True:
+        if transparent:
             kwargs.setdefault('facecolor', 'none')
             kwargs.setdefault('edgecolor', 'none')
             original_axes_colors = []
@@ -181,27 +194,8 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         if 'rv' in os.getenv('ITERMPLOT', ''):
             self.reverse()
 
-        image_dpi = kwargs.get('dpi', 72)  # dpi to use for images
-        self.figure.set_dpi(72)            # there are 72 pdf points to an inch
-        width, height = self.figure.get_size_inches()
-        if isinstance(filename, PdfPages):
-            file = filename._file
-        else:
-            file = PdfFile(filename)
-        try:
-            file.newPage(width, height)
-            _bbox_inches_restore = kwargs.pop("bbox_inches_restore", None)
-            renderer = MixedModeRenderer(
-                self.figure, width, height, image_dpi,
-                RendererPdf(file, image_dpi),
-                bbox_inches_restore=_bbox_inches_restore)
-            self.figure.draw(renderer)
-            renderer.finalize()
-        finally:
-            if isinstance(filename, PdfPages):  # finish off this page
-                file.endStream()
-            else:            # we opened the file above; now finish it off
-                file.close()
+        FigureCanvasPdf.print_pdf(self, filename, **kwargs)
+
 
 class MyFigureManager(FigureManagerBase):
 
@@ -209,11 +203,14 @@ class MyFigureManager(FigureManagerBase):
         FigureManagerBase.__init__(self, canvas, num)
 
     def show(self):
-        #colors()
         data = io.BytesIO()
         self.canvas.print_figure(data, facecolor='none',
                                  edgecolor='none', transparent=True)
-        imgcat(data.getbuffer())
+        if hasattr(data, 'getbuffer'):
+            imgcat(data.getbuffer())
+        else:
+            imgcat(data.getvalue())
+
 
 FigureCanvas = FigureCanvasPdf
 FigureManager = MyFigureManager

@@ -45,6 +45,10 @@ export ITERMPLOT="rv"
 itermplot tries to auto-detect TMUX and behave in a sane way. Vertical split panes do not work well due to a
 limitation with iTerm2. Luckily, horizontals do though.
 
+### Python 2 and Python 3 support
+
+Now supports Python 2, even if this makes me want to cry 😭
+
 ## Installation
 
 ### Using pip
