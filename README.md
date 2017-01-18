@@ -134,9 +134,9 @@ pip3 uninstall itermplot
 
 ## Bugs
 
-This backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it. Thanks.
+This backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it.
 
-I also accept (and appreciate!) patches / pull request.
+I also accept (and appreciate!) patches / pull request. Thanks to [garrywu](https://github.com/garywu), [brenshanny](https://github.com/brenshanny), and [hbredin](https://github.com/hbredin) for their patches so far.
 
 ## Other cool things
 
