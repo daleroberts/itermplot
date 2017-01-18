@@ -17,7 +17,7 @@ import os
 import io
 
 from matplotlib._pylab_helpers import Gcf
-from matplotlib.colors import ColorConverter
+from matplotlib.colors import ColorConverter, to_rgba
 from matplotlib.backend_bases import FigureManagerBase, TimerBase
 from matplotlib.backends.backend_mixed import MixedModeRenderer
 from matplotlib.backends.backend_pdf import FigureCanvasPdf, PdfPages, PdfFile, RendererPdf
@@ -46,7 +46,7 @@ def revvideo(x):
     return the object unchanged if it can't."""
     def rev(c):
         if isinstance(c, str):
-            c = COLORS[c]
+            c = to_rgba(c)
 
         if len(c) == 4:
             r, g, b, a = c
