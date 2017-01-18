@@ -18,10 +18,11 @@ import io
 
 from matplotlib._pylab_helpers import Gcf
 from matplotlib.colors import ColorConverter
-from matplotlib.backend_bases import FigureManagerBase
+from matplotlib.backend_bases import FigureManagerBase, TimerBase
 from matplotlib.backends.backend_mixed import MixedModeRenderer
 from matplotlib.backends.backend_pdf import FigureCanvasPdf, PdfPages, PdfFile, RendererPdf
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+from matplotlib.animation import ImageMagickWriter
 from matplotlib.figure import Figure
 from base64 import b64encode
 
@@ -41,7 +42,7 @@ else:
 
 
 def revvideo(x):
-    """Try to 'reverse video' the color. Otherwise, 
+    """Try to 'reverse video' the color. Otherwise,
     return the object unchanged if it can't."""
     def rev(c):
         if isinstance(c, str):
@@ -53,7 +54,7 @@ def revvideo(x):
         else:
             r, g, b = c
             return (1.0 - r, 1.0 - g, 1.0 - b, 1.0)
-    
+
     try:
         if isinstance(x, str) and x == 'none':
             return x
@@ -79,22 +80,22 @@ def imgcat(data, lines=-1):
         osc = b'\033]'
         st = b'\a'
     csi = b'\033['
-    
+
     buf = bytes()
-    
+
     if lines > 0:
         buf += lines*b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
         dims = 'width=auto;height=auto'
-    
+
     buf += B('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
-    
+
     if lines > 0:
-        buf += csi + B('%dE' % lines) + csi + b'?25h' 
-    
+        buf += csi + B('%dE' % lines) + csi + b'?25h'
+
     if hasattr(sys.stdout, 'buffer'):
         sys.stdout.buffer.write(buf)
     else:
@@ -136,6 +137,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
     def __init__(self, figure):
         FigureCanvasPdf.__init__(self, figure)
         self.reversed = False
+        self.supports_blit = False
 
     def reverse(self, **kwargs):
         if self.reversed:
@@ -172,6 +174,10 @@ class FigureCanvasItermplot(FigureCanvasPdf):
 
         self.reversed = True
 
+    def new_timer(self, *args, **kwargs):
+        self.timer = TimerBase(*args, **kwargs)
+        return self.timer
+
     def print_pdf(self, filename, **kwargs):
         transparent = kwargs.pop('transparent',
                                  rcParams['savefig.transparent'])
@@ -197,15 +203,50 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         FigureCanvasPdf.print_pdf(self, filename, **kwargs)
 
 
+class MyImageMagickWriter(ImageMagickWriter):
+    def cleanup(self):
+        #ImageMagickWriter perhaps can expose out and err, PR to Matplotlib someday
+        out, err = self._proc.communicate()
+        self.data = io.BytesIO(out)
+        self._frame_sink().close()
+
 class MyFigureManager(FigureManagerBase):
 
     def __init__(self, canvas, num):
         FigureManagerBase.__init__(self, canvas, num)
 
+    def animate(self, loops, outfile=None, dpi=80):
+        if outfile is None:
+            outfile = 'gif:-'
+
+        self.canvas.draw_event(None)
+        writer = MyImageMagickWriter()
+        with writer.saving(self.canvas.figure, outfile, dpi):
+            for i in range(loops):
+                self.canvas.timer._on_timer()
+                writer.grab_frame()
+        if outfile != 'gif:-':
+            with open(outfile, 'rb') as f:
+                data = io.BytesIO(f.read())
+        else:
+            data = writer.data
+        return data
+
     def show(self):
         data = io.BytesIO()
-        self.canvas.print_figure(data, facecolor='none',
-                                 edgecolor='none', transparent=True)
+
+        loops = os.getenv('ITERMPLOT_FRAMES', 0)
+        try:
+            loops = int(loops)
+        except ValueError:
+            loops = 0
+        if not loops:
+            self.canvas.print_figure(data, facecolor='none',
+                                     edgecolor='none', transparent=True)
+        else:
+            outfile = os.getenv('ITERMPLOT_OUTFILE')
+            data = self.animate(loops, outfile)
+
         if hasattr(data, 'getbuffer'):
             imgcat(data.getbuffer())
         else:
