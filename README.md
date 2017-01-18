@@ -4,7 +4,7 @@ An awesome [iTerm2](https://www.iterm2.com/) backend for Matplotlib, so you can 
 
 <img src="https://github.com/daleroberts/itermplot/raw/master/docs/lightdark.png" width="960">
 
-The above is achieved with zero modifications to your Python script. For example, the above 
+The above is achieved with zero modifications to your Python script. For example, the above
 plots are generated with the following code:
 ```{python}
 import numpy as np
@@ -44,6 +44,48 @@ export ITERMPLOT="rv"
 
 itermplot tries to auto-detect TMUX and behave in a sane way. Vertical split panes do not work well due to a
 limitation with iTerm2. Luckily, horizontals do though.
+
+### GIF Animation support
+
+itermpolt supports gif animation created by matplotlib animation module. You'll need to install ImageMagick and have it on the path to use the animation support.
+
+simpliest way to see if ImageMagick is installed and valid is to run:
+```
+$ convert -version
+Version: ImageMagick 7.0.4-4 Q16 x86_64 2017-01-14 http://www.imagemagick.org
+Copyright: © 1999-2017 ImageMagick Studio LLC
+License: http://www.imagemagick.org/script/license.php
+Features: Cipher DPC HDRI Modules
+Delegates (built-in): bzlib freetype jng jpeg ltdl lzma png tiff xml zlib
+```
+
+enable animation by specifying desired number of frames in the output animation to env:
+```
+export ITERMPLOT_FRAMES=30
+```
+here is running the simple_3danim.py from matplotlib:
+```
+$ ITERMPLOT_FRAMES=30 python matplotlib/examples/animation/simple_3danim.py
+```
+<img src="docs/simple_3danim.gif" width="960">
+
+
+source of the animation is from matplotlib, you can find this and other examples:
+```
+https://github.com/matplotlib/matplotlib/tree/master/examples/animation
+```
+
+You can also save the resulting gif file by using env:
+```
+export ITERMPLOT_OUTFILE=out.gif
+```
+
+here is running the simple_3danim.py from matplotlib with output file:
+```
+$ ITERMPLOT_ANIMATE=30 ITERMPLOT_OUTFILE=out.gif python matplotlib/examples/animation/simple_3danim.py
+```
+
+currently gif animation does not support reverse video with ITERMPLOT="rv".
 
 ### Python 2 and Python 3 support
 
@@ -106,7 +148,7 @@ pip3 uninstall itermplot
 
 ## Bugs
 
-This is backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it. Thanks.
+This backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it. Thanks.
 
 I also accept (and appreciate!) patches / pull request.
 
