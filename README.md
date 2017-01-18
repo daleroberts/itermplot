@@ -45,12 +45,12 @@ export ITERMPLOT="rv"
 itermplot tries to auto-detect TMUX and behave in a sane way. Vertical split panes do not work well due to a
 limitation with iTerm2. Luckily, horizontals do though.
 
-### GIF Animation support
+### Animation support
 
-itermpolt supports gif animation created by matplotlib animation module. You'll need to install ImageMagick and have it on the path to use the animation support.
+<img src="docs/animated.gif" width="600">
 
-simpliest way to see if ImageMagick is installed and valid is to run:
-```
+itermplot supports animation created by matplotlib animation module. You'll need to install ImageMagick and have it on the path to use the animation support. The simpliest way to see if ImageMagick is installed and valid is to run:
+```{sh}
 $ convert -version
 Version: ImageMagick 7.0.4-4 Q16 x86_64 2017-01-14 http://www.imagemagick.org
 Copyright: © 1999-2017 ImageMagick Studio LLC
@@ -59,33 +59,17 @@ Features: Cipher DPC HDRI Modules
 Delegates (built-in): bzlib freetype jng jpeg ltdl lzma png tiff xml zlib
 ```
 
-enable animation by specifying desired number of frames in the output animation to env:
+To enable animation support, you need to specifying the desired number of frames in the output animation. For example, specify it before your script with:
 ```
-export ITERMPLOT_FRAMES=30
-```
-here is running the simple_3danim.py from matplotlib:
-```
-$ ITERMPLOT_FRAMES=30 python matplotlib/examples/animation/simple_3danim.py
-```
-<img src="docs/simple_3danim.gif" width="960">
-
-
-source of the animation is from matplotlib, you can find this and other examples:
-```
-https://github.com/matplotlib/matplotlib/tree/master/examples/animation
+$ ITERMPLOT_FRAMES=30 python script.py
 ```
 
-You can also save the resulting gif file by using env:
+You can also save the resulting gif file by using `ITERMPLOT_OUTFILE` environment variable:
 ```
-export ITERMPLOT_OUTFILE=out.gif
-```
-
-here is running the simple_3danim.py from matplotlib with output file:
-```
-$ ITERMPLOT_ANIMATE=30 ITERMPLOT_OUTFILE=out.gif python matplotlib/examples/animation/simple_3danim.py
+$ ITERMPLOT_FRAMES=30 ITERMPLOT_OUTFILE=out.gif python script.py
 ```
 
-currently gif animation does not support reverse video with ITERMPLOT="rv".
+Currently animation does not support reverse video with ITERMPLOT="rv".
 
 ### Python 2 and Python 3 support
 
