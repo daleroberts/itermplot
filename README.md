@@ -49,7 +49,7 @@ limitation with iTerm2. Luckily, horizontals do though.
 
 itermplot supports animation created by matplotlib animation module.
 
-<img src="docs/animated.gif" width="600">
+<img src="docs/animated.gif" width="500">
 
 You'll need to install ImageMagick and have it on the path to use the animation support. The simpliest way to see if ImageMagick is installed and valid is to run:
 ```{sh}
