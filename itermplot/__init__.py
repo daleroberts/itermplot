@@ -17,7 +17,7 @@ import os
 import io
 
 from matplotlib._pylab_helpers import Gcf
-from matplotlib.colors import ColorConverter, to_rgba
+from matplotlib.colors import ColorConverter
 from matplotlib.backend_bases import FigureManagerBase, TimerBase
 from matplotlib.backends.backend_mixed import MixedModeRenderer
 from matplotlib.backends.backend_pdf import FigureCanvasPdf, PdfPages, PdfFile, RendererPdf
@@ -31,6 +31,7 @@ rcParams = matplotlib.rcParams
 TMUX = os.getenv('TERM','').startswith('screen')
 COLORS = ColorConverter.colors
 
+to_rgba = ColorConverter().to_rgba
 
 if sys.version_info < (3,):
     # Supporting Python 2 makes me want to cry :_(
@@ -45,7 +46,7 @@ def revvideo(x):
     """Try to 'reverse video' the color. Otherwise,
     return the object unchanged if it can't."""
     def rev(c):
-        if isinstance(c, str):
+        if isinstance(c, six.string_types): 
             c = to_rgba(c)
 
         if len(c) == 4:
@@ -61,7 +62,8 @@ def revvideo(x):
         if isinstance(x, np.ndarray):
             return np.array([rev(el) for el in x])
         return rev(x)
-    except (ValueError, KeyError):
+    except (ValueError, KeyError) as e:
+        print('bad', x, e)
         return x
 
 
