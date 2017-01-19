@@ -140,6 +140,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         FigureCanvasPdf.__init__(self, figure)
         self.reversed = False
         self.supports_blit = False
+        self.timer = None
 
     def reverse(self, **kwargs):
         if self.reversed:
@@ -242,7 +243,7 @@ class MyFigureManager(FigureManagerBase):
             loops = int(loops)
         except ValueError:
             loops = 0
-        if not loops:
+        if not loops or self.canvas.timer is None:
             self.canvas.print_figure(data, facecolor='none',
                                      edgecolor='none', transparent=True)
         else:
