@@ -7,7 +7,7 @@ setup(name='itermplot',
         'six',
         'numpy'
       ],
-      version='0.17',
+      version='0.18',
       description='An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.',
       url='http://github.com/daleroberts/itermplot',
       author='Dale Roberts',
