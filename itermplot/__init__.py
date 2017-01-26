@@ -26,12 +26,19 @@ from matplotlib.animation import ImageMagickWriter
 from matplotlib.figure import Figure
 from base64 import b64encode
 
+to_rgba = ColorConverter().to_rgba
 rcParams = matplotlib.rcParams
 
-TMUX = os.getenv('TERM','').startswith('screen')
-COLORS = ColorConverter.colors
-
-to_rgba = ColorConverter().to_rgba
+try:
+    TMUX = os.getenv('TERM', '').startswith('screen')
+    LINES = int(os.getenv('ITERMPLOT_LINES', '-1'))
+    THEME = os.getenv('ITERMPLOT', '') # perhaps rename this now
+    OUTFILE = os.getenv('ITERMPLOT_OUTFILE', 'out.gif')
+    FRAMES = int(os.getenv('ITERMPLOT_FRAMES', '0'))
+    COLORS = ColorConverter.colors
+except ValueError:
+    print('Error: problems with itermplot configuration.')
+    sys.exit(1)
 
 if sys.version_info < (3,):
     # Supporting Python 2 makes me want to cry :_(
@@ -46,7 +53,7 @@ def revvideo(x):
     """Try to 'reverse video' the color. Otherwise,
     return the object unchanged if it can't."""
     def rev(c):
-        if isinstance(c, six.string_types): 
+        if isinstance(c, six.string_types):
             c = to_rgba(c)
 
         if len(c) == 4:
@@ -67,11 +74,13 @@ def revvideo(x):
         return x
 
 
-def imgcat(data, lines=-1):
+def imgcat(data):
     """Output the image data to the iTerm2 console. If `lines` is greater
     than zero then advance the console `lines` number of blank lines, move
     back, and then output the image. This is the default behaviour if TMUX
     is detected (lines set to 10)."""
+
+    lines = LINES
 
     if TMUX:
         if lines == -1:
@@ -86,7 +95,7 @@ def imgcat(data, lines=-1):
     buf = bytes()
 
     if lines > 0:
-        buf += lines*b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
+        buf += lines * b'\n' + csi + b'?25l' + csi + B('%dF' % lines) + osc
         dims = 'width=auto;height=%d;preserveAspectRatio=1' % lines
     else:
         buf += osc
@@ -112,6 +121,7 @@ def draw_if_interactive():
         figmanager = Gcf.get_active()
         if figmanager is not None:
             figmanager.show()
+
 
 def show():
     figmanager = Gcf.get_active()
@@ -200,20 +210,23 @@ class FigureCanvasItermplot(FigureCanvasPdf):
             kwargs.setdefault('facecolor', rcParams['savefig.facecolor'])
             kwargs.setdefault('edgecolor', rcParams['savefig.edgecolor'])
 
-        if 'rv' in os.getenv('ITERMPLOT', ''):
+        if 'rv' in THEME:
             self.reverse()
 
         FigureCanvasPdf.print_pdf(self, filename, **kwargs)
 
 
-class MyImageMagickWriter(ImageMagickWriter):
+class ItermplotImageMagickWriter(ImageMagickWriter):
+
     def cleanup(self):
-        #ImageMagickWriter perhaps can expose out and err, PR to Matplotlib someday
+        # ImageMagickWriter perhaps can expose out and err, PR to Matplotlib
+        # someday
         out, err = self._proc.communicate()
         self.data = io.BytesIO(out)
         self._frame_sink().close()
 
-class MyFigureManager(FigureManagerBase):
+
+class ItermplotFigureManager(FigureManagerBase):
 
     def __init__(self, canvas, num):
         FigureManagerBase.__init__(self, canvas, num)
@@ -223,38 +236,42 @@ class MyFigureManager(FigureManagerBase):
             outfile = 'gif:-'
 
         self.canvas.draw_event(None)
-        writer = MyImageMagickWriter()
+        
+        writer = ItermplotImageMagickWriter()
         with writer.saving(self.canvas.figure, outfile, dpi):
-            for i in range(loops):
+            for _ in range(loops):
                 self.canvas.timer._on_timer()
                 writer.grab_frame()
+
         if outfile != 'gif:-':
             with open(outfile, 'rb') as f:
                 data = io.BytesIO(f.read())
         else:
             data = writer.data
+
         return data
 
     def show(self):
         data = io.BytesIO()
 
-        loops = os.getenv('ITERMPLOT_FRAMES', 0)
+        loops = FRAMES
         try:
             loops = int(loops)
         except ValueError:
             loops = 0
         if not loops or self.canvas.timer is None:
             self.canvas.print_figure(data, facecolor='none',
-                                     edgecolor='none', transparent=True)
+                                     edgecolor='none',
+                                     transparent=True)
         else:
-            outfile = os.getenv('ITERMPLOT_OUTFILE')
+            outfile = OUTFILE
             data = self.animate(loops, outfile)
 
         if hasattr(data, 'getbuffer'):
             imgcat(data.getbuffer())
-        else:
+        else: # Python 2
             imgcat(data.getvalue())
 
 
-FigureCanvas = FigureCanvasPdf
-FigureManager = MyFigureManager
+FigureCanvas = FigureCanvasItermplot
+FigureManager = ItermplotFigureManager
