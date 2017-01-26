@@ -37,7 +37,7 @@ Note: you need to run `plt.show()` to display the figure.
 
 If you use a dark background in your terminal, you can enable "reverse video" mode by adding this to your `.profile`:
 ```
-export ITERMPLOT="rv"
+export ITERMPLOT=rv
 ```
 
 ### TMUX support
@@ -71,7 +71,14 @@ You can also save the resulting gif file by using `ITERMPLOT_OUTFILE` environmen
 $ ITERMPLOT_FRAMES=30 ITERMPLOT_OUTFILE=out.gif python script.py
 ```
 
-Currently animation does not support reverse video with ITERMPLOT="rv".
+Currently animation does not support reverse video with ITERMPLOT=rv.
+
+### Configure lines
+
+You can configure the number of lines used with the `ITERMPLOT_LINES` environment variable. For example:
+```{sh}
+ITERMPLOT_LINES=5 python3 simple.py
+```
 
 ### Python 2 and Python 3 support
 
