@@ -262,7 +262,8 @@ class ItermplotFigureManager(FigureManagerBase):
         if not loops or self.canvas.timer is None:
             self.canvas.print_figure(data, facecolor='none',
                                      edgecolor='none',
-                                     transparent=True)
+                                     transparent=True,
+                                     format='jpg')
         else:
             outfile = OUTFILE
             data = self.animate(loops, outfile)
