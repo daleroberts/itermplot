@@ -74,7 +74,7 @@ def revvideo(x):
         return x
 
 
-def imgcat(data):
+def imgcat(data, fn='plot.pdf'):
     """Output the image data to the iTerm2 console. If `lines` is greater
     than zero then advance the console `lines` number of blank lines, move
     back, and then output the image. This is the default behaviour if TMUX
@@ -101,7 +101,9 @@ def imgcat(data):
         buf += osc
         dims = 'width=auto;height=auto'
 
-    buf += B('1337;File=;size=%d;inline=1;' % len(data) + dims + ':')
+    buf += B('1337;File=name=')
+    buf += b64encode(B(fn))
+    buf += B(';size=%d;inline=1;' % len(data) + dims + ':')
     buf += b64encode(data) + st
 
     if lines > 0:
@@ -260,17 +262,19 @@ class ItermplotFigureManager(FigureManagerBase):
         except ValueError:
             loops = 0
         if not loops or self.canvas.timer is None:
+            fn = 'plot.pdf'
             self.canvas.print_figure(data, facecolor='none',
                                      edgecolor='none',
                                      transparent=True)
         else:
             outfile = OUTFILE
+            fn = 'plot.gif'
             data = self.animate(loops, outfile)
 
         if hasattr(data, 'getbuffer'):
-            imgcat(data.getbuffer())
+            imgcat(data.getbuffer(), fn)
         else: # Python 2
-            imgcat(data.getvalue())
+            imgcat(data.getvalue(), fn)
 
 
 FigureCanvas = FigureCanvasItermplot
