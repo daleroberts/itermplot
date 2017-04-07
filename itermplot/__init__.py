@@ -276,6 +276,8 @@ class ItermplotFigureManager(FigureManagerBase):
         else: # Python 2
             imgcat(data.getvalue(), fn)
 
+        self.canvas.reversed = False
+
 
 FigureCanvas = FigureCanvasItermplot
 FigureManager = ItermplotFigureManager
