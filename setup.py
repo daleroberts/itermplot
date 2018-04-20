@@ -1,4 +1,14 @@
 from setuptools import setup, find_packages
+from os import path
+
+here = path.abspath(path.dirname(__file__))
+
+try:
+    with open(path.join(here, 'README'), encoding='utf-8') as f:
+        long_description = f.read()
+except(IOError):
+    with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
 
 setup(name='itermplot',
       packages=find_packages(),
@@ -7,8 +17,9 @@ setup(name='itermplot',
         'six',
         'numpy'
       ],
-      version='0.20',
+      version='0.321',
       description='An awesome iTerm2 backend for Matplotlib, so you can plot directly in your terminal.',
+      long_description=long_description,
       url='http://github.com/daleroberts/itermplot',
       author='Dale Roberts',
       author_email='dale.o.roberts@gmail.com',

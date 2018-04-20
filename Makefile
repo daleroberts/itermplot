@@ -1,5 +1,6 @@
 upload:
-	python3 setup.py sdist register upload
+	pandoc --from=markdown --to=rst --output=README README.md
+	python3 setup.py sdist upload
 
 clean:
 	@rm -fr build dist

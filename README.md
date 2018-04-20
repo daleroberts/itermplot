@@ -143,7 +143,7 @@ pip3 uninstall itermplot
 
 This backend is very alpha, so if you have a problem please raise an Issue on GitHub and I will try to fix it.
 
-I also accept (and appreciate!) patches / pull request. Thanks to [garrywu](https://github.com/garywu), [brenshanny](https://github.com/brenshanny), and [hbredin](https://github.com/hbredin) for their patches so far.
+I also accept (and appreciate!) good patches / pull request. Thanks to [garrywu](https://github.com/garywu), [brenshanny](https://github.com/brenshanny), [hbredin](https://github.com/hbredin), [zevlg](https://github.com/zevlg) for their patches so far.
 
 ## Other cool things
 
