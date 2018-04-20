@@ -34,6 +34,7 @@ try:
     LINES = int(os.getenv('ITERMPLOT_LINES', '-1'))
     THEME = os.getenv('ITERMPLOT', '') # perhaps rename this now
     OUTFILE = os.getenv('ITERMPLOT_OUTFILE', 'out.gif')
+    PLOTFILE = os.getenv('ITERMPLOT_PLOTFILE', 'plot.pdf')
     FRAMES = int(os.getenv('ITERMPLOT_FRAMES', '0'))
     COLORS = ColorConverter.colors
 except ValueError:
@@ -141,15 +142,13 @@ def new_figure_manager(num, *args, **kwargs):
 
 
 def new_figure_manager_given_figure(num, figure):
-    canvas = FigureCanvasItermplot(figure)
+    canvas = FigureCanvas(figure)
     manager = FigureManager(canvas, num)
     return manager
 
 
-class FigureCanvasItermplot(FigureCanvasPdf):
-
-    def __init__(self, figure):
-        FigureCanvasPdf.__init__(self, figure)
+class ItermplotCanvasMixin:
+    def __init__(self):
         self.reversed = False
         self.supports_blit = False
         self.timer = None
@@ -193,7 +192,7 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         self.timer = TimerBase(*args, **kwargs)
         return self.timer
 
-    def print_pdf(self, filename, **kwargs):
+    def before_print(self, **kwargs):
         transparent = kwargs.pop('transparent',
                                  rcParams['savefig.transparent'])
 
@@ -215,7 +214,25 @@ class FigureCanvasItermplot(FigureCanvasPdf):
         if 'rv' in THEME:
             self.reverse()
 
+
+class FigureCanvasItermplotPdf(FigureCanvasPdf, ItermplotCanvasMixin):
+    def __init__(self, figure):
+        FigureCanvasPdf.__init__(self, figure)
+        ItermplotCanvasMixin.__init__(self)
+
+    def print_pdf(self, filename, **kwargs):
+        ItermplotCanvasMixin.before_print(self, **kwargs)
         FigureCanvasPdf.print_pdf(self, filename, **kwargs)
+
+
+class FigureCanvasItermplotPng(FigureCanvasAgg, ItermplotCanvasMixin):
+    def __init__(self, figure):
+        FigureCanvasAgg.__init__(self, figure)
+        ItermplotCanvasMixin.__init__(self)
+
+    def print_png(self, filename, **kwargs):
+        ItermplotCanvasMixin.before_print(self, **kwargs)
+        FigureCanvasAgg.print_png(self, filename, **kwargs)
 
 
 class ItermplotImageMagickWriter(ImageMagickWriter):
@@ -238,7 +255,7 @@ class ItermplotFigureManager(FigureManagerBase):
             outfile = 'gif:-'
 
         self.canvas.draw_event(None)
-        
+
         writer = ItermplotImageMagickWriter()
         with writer.saving(self.canvas.figure, outfile, dpi):
             for _ in range(loops):
@@ -262,7 +279,7 @@ class ItermplotFigureManager(FigureManagerBase):
         except ValueError:
             loops = 0
         if not loops or self.canvas.timer is None:
-            fn = 'plot.pdf'
+            fn = PLOTFILE
             self.canvas.print_figure(data, facecolor='none',
                                      edgecolor='none',
                                      transparent=True)
@@ -279,5 +296,8 @@ class ItermplotFigureManager(FigureManagerBase):
         self.canvas.reversed = False
 
 
-FigureCanvas = FigureCanvasItermplot
+if os.path.splitext(PLOTFILE)[1] == '.png':
+    FigureCanvas = FigureCanvasItermplotPng
+else:
+    FigureCanvas = FigureCanvasItermplotPdf
 FigureManager = ItermplotFigureManager
