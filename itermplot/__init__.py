@@ -282,7 +282,8 @@ class ItermplotFigureManager(FigureManagerBase):
             fn = PLOTFILE
             self.canvas.print_figure(data, facecolor='none',
                                      edgecolor='none',
-                                     transparent=True)
+                                     transparent=True,
+                                     format='jpg')
         else:
             outfile = OUTFILE
             fn = 'plot.gif'
