@@ -299,8 +299,6 @@ class ItermplotFigureManager(FigureManagerBase):
         else:  # Python 2
             imgcat(data.getvalue(), fn)
 
-        self.canvas.reversed = False
-
 
 if os.path.splitext(PLOTFILE)[1] == ".png":
     FigureCanvas = FigureCanvasItermplotPng
