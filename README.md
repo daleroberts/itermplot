@@ -1,5 +1,9 @@
 # itermplot
 
+```
+pip install itermplot==0.4
+```
+
 An awesome [iTerm2](https://www.iterm2.com/) backend for Matplotlib, so you can plot directly in your terminal.
 
 <img src="https://github.com/daleroberts/itermplot/raw/master/docs/lightdark.png" width="960">
