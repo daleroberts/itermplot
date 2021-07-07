@@ -240,12 +240,12 @@ class FigureCanvasItermplotPng(FigureCanvasAgg, ItermplotCanvasMixin):
 
     def print_png(self, filename, **kwargs):
         ItermplotCanvasMixin.before_print(self, **kwargs)
-        FigureCanvasAgg.print_png(self, filename, **kwargs)
+        FigureCanvasAgg.print_png(self, filename)
 
 
 class ItermplotImageMagickWriter(ImageMagickWriter):
     def cleanup(self):
-        # ImageMagickWriter perhaps can expose out and err, PR 
+        # ImageMagickWriter perhaps can expose out and err, PR
         # to Matplotlib someday
         out, err = self._proc.communicate()
         self.data = io.BytesIO(out)
