@@ -51,7 +51,7 @@ itermplot supports animation created by matplotlib animation module.
 
 <img src="docs/animated.gif" width="500">
 
-You'll need to install ImageMagick and have it on the path to use the animation support. The simpliest way to see if ImageMagick is installed and valid is to run:
+You'll need to install ImageMagick and have it on the path to use the animation support. The simplest way to see if ImageMagick is installed and valid is to run:
 ```{sh}
 $ convert -version
 Version: ImageMagick 7.0.4-4 Q16 x86_64 2017-01-14 http://www.imagemagick.org
