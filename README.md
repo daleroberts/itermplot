@@ -1,7 +1,7 @@
 # itermplot
 
 ```
-pip install itermplot==0.4
+pip install itermplot==0.5
 ```
 
 An awesome [iTerm2](https://www.iterm2.com/) backend for Matplotlib, so you can plot directly in your terminal.
