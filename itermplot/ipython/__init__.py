@@ -9,7 +9,7 @@ e.g.
 implemented based on https://ipython.readthedocs.io/en/stable/config/shell_mimerenderer.html
 """
 
-from . import imgcat
+from .. import imgcat
 
 
 def register_mimerenderer(ipython, mime, handler):
