@@ -19,5 +19,9 @@ def register_mimerenderer(ipython, mime, handler):
 
 
 def load_ipython_extension(ipython):
-    register_mimerenderer(ipython, "image/png", lambda img: imgcat(img, fn="img.png"))
-    register_mimerenderer(ipython, "image/jpeg", lambda img: imgcat(img, fn="img.jpg"))
+    register_mimerenderer(
+        ipython, "image/png", lambda img, _: imgcat(img, fn="img.png")
+    )
+    register_mimerenderer(
+        ipython, "image/jpeg", lambda img, _: imgcat(img, fn="img.jpg")
+    )
