@@ -18,10 +18,16 @@ def register_mimerenderer(ipython, mime, handler):
     ipython.mime_renderers[mime] = handler
 
 
+def _imgcater(fn):
+    def _wrapper(img, _):
+        import pdb
+
+        pdb.set_trace()
+        imgcat(img, fn=fn)
+
+    return _wrapper
+
+
 def load_ipython_extension(ipython):
-    register_mimerenderer(
-        ipython, "image/png", lambda img, _: imgcat(img, fn="img.png")
-    )
-    register_mimerenderer(
-        ipython, "image/jpeg", lambda img, _: imgcat(img, fn="img.jpg")
-    )
+    register_mimerenderer(ipython, "image/png", _imgcater(fn="img.png"))
+    register_mimerenderer(ipython, "image/jpeg", _imgcater(fn="img.jpg"))
