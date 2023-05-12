@@ -121,6 +121,17 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 You should see a plot!
 
+### image mimetype support
+
+If you want to display a wider variety of objects using ipython's mimetype capturing, load our bundled ipython extension:
+
+```ipython
+$ %load_ext itermplot.ipython
+$ from PIL import Image
+$ Image.open("my_cool_image.png")
+# your image should be displayed
+```
+
 ## Uninstall
 
 You can disable this backend by unsetting the `MPLBACKEND` environment variable.
