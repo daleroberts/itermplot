@@ -19,10 +19,8 @@ def register_mimerenderer(ipython, mime, handler):
 
 
 def _imgcater(fn):
-    def _wrapper(img, _):
-        import pdb
-
-        pdb.set_trace()
+    def _wrapper(img, metadata):
+        breakpoint()
         imgcat(img, fn=fn)
 
     return _wrapper
