@@ -20,7 +20,16 @@ def register_mimerenderer(ipython, mime, handler):
 
 def imgcat_factory(fn):
     def _wrapper(img, _):
-        imgcat(img, fn=fn)
+        if isinstance(img, bytes):
+            return imgcat(img, fn=fn)
+        elif hasattr(img, "read"):
+            return imgcat(img.read(), fn=fn)
+        elif isinstance(img, str):
+            return imgcat(img.encode(), fn=fn)
+        else:
+            raise ValueError(
+                "imgcat only accepts bytes, file-like objects, and strings"
+            )
 
     return _wrapper
 
