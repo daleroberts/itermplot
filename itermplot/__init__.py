@@ -83,7 +83,7 @@ def revvideo(x):
         return x
 
 
-def imgcat(data, fn="plot.pdf"):
+def imgcat(data: bytes, fn="plot.pdf"):
     """Output the image data to the iTerm2 console. If `lines` is greater
     than zero then advance the console `lines` number of blank lines, move
     back, and then output the image. This is the default behaviour if TMUX
